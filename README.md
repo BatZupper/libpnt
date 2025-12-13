@@ -18,4 +18,4 @@ at the moment the library can fully work with the headers but it can't extract t
 ## Documentation
 
 The documentation related to the usage of the library is [here](docs/usage.md)
-The documentation related to the file format is [here](pnt/file.md)
+The documentation related to the file format is [here](docs/pnt.md)
