@@ -26,47 +26,11 @@ struct PaintEntry {
 
 wich they look like this. Also the magic number is clear with is __"PNT "__ (50 4E 54 00 exadecimal) and looking at the code the compression might be something GZIP based but I'm not entirely sure yet.
 
-Fpr the 16 bytes metadata array looking at the code is probably some encoded version of the words of the MD5 algorithm
+For the 16 bytes metadata array looking at the code is probably some encoded version of the words of the MD5 algorithm
 
 ## Decompressing
 
-for decompressing due to the limited knowledge on the format i only made a header parser in python
-
-```Py
-import os
-import struct
-import zlib
-from PIL import Image
-import sys
-
-def read_c_string(raw):
-    return raw.split(b"\x00", 1)[0].decode(errors="ignore")
-
-def extract_pnt(path):
-    with open(path, "rb") as f:
-        signature = f.read(4) #PNT 
-
-        base_name_raw = f.read(100)
-        base_name = read_c_string(base_name_raw)
-
-        num_images = struct.unpack("<I", f.read(4))[0]
-
-        print("File:", path)
-        print("Base name:", base_name)
-        print("Images:", num_images)
-
-    print("Done.")
-
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python read_header.py <file.pnt>")
-        sys.exit(1)
-
-    pnt_file = sys.argv[1]
-    extract_pnt(pnt_file)
-```
-
-i could also make the parse for Entry/Second header but i want to focus more on the decomp
+for decompressing the library only handle the parsing of the pnt and image header but as soon as i manage to decompress even a pixel of data i will put it in the library
 
 ## Compressing
 
