@@ -29,7 +29,7 @@
 
 //check if the magic number is correct. If it is returns 0 otherwise 1
 int pntCheck(FILE* pntFile) {
-    char magicNumber[4];
+    char magicNumber[MAGIC_NUMBER_SIZE];
     size_t bytesRead = fread(magicNumber, 1, MAGIC_NUMBER_SIZE, pntFile);
     //after reading set the offset to 0
     fseek(pntFile, 0, SEEK_SET);
@@ -42,15 +42,12 @@ int pntCheck(FILE* pntFile) {
     //if the check fails trow an error
     else
         return 1;
-    
-    //if anything goes wrong just throw an error
-    return 1;
 }
 
 //get the header from the paint file
 PaintFileHeader getPNTHeader(FILE* pntFile) {
     PaintFileHeader tempHeader;
-    char buffer[108];
+    char buffer[HEADER_SIZE];
     size_t bytesRead = fread(buffer, 1, HEADER_SIZE, pntFile);
     //if the bytes read are too little return nothing
     if(bytesRead < HEADER_SIZE) {
@@ -78,10 +75,10 @@ ImageHeader getPNTImageHeader(FILE* pntFile, int index) {
     char* ptr = buffer + HEADER_SIZE;
 
     for (int i = 0; i < index; i++) {
-        ptr += IMAGE_HEADER_SIZE - 4;        // skip header
+        ptr += IMAGE_HEADER_SIZE - IMAGE_DATA_SIZE_SIZE;    // skip header
         long dataSize;
-        memcpy(&dataSize, ptr, 4);       // read dataSize dimension
-        ptr += 4 + dataSize;             // skip data
+        memcpy(&dataSize, ptr, IMAGE_DATA_SIZE_SIZE);       // read dataSize dimension
+        ptr += IMAGE_DATA_SIZE_SIZE + dataSize;             // skip data
     }
 
     ImageHeader header;
