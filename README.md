@@ -1,6 +1,6 @@
 # libpnt
 
-A simple C library for the PiBoSo paint file format (.pnt)
+A simple C and Python library for the PiBoSo paint file format (.pnt)
 
 ## Progress
 
