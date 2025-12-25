@@ -12,8 +12,9 @@ at the moment the library can fully work with the headers but it can't extract t
 - [x] Get the first image header
 - [x] Get image header by index
 - [ ] Work with the 16 byte image metadata
-- [ ] Extract first image
-- [ ] Extract image by index
+- [x] Extract first image
+- [x] Extract image by index
+- [ ] Create PNT file
 
 ## Documentation
 

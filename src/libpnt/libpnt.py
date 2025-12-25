@@ -76,7 +76,7 @@ def getImageHeader(pntFile, index):
     pntFile.seek(0)
     return imageHeader
 
-#decompress image (specified by index)
+#decompress image (specified by index) and returns the decompressed data
 def decompressImage(pntFile, index):
     pntFile.seek(HEADER_SIZE)
 
@@ -97,3 +97,6 @@ def decompressImage(pntFile, index):
             tgaHeader = struct.pack("<BBBHHBHHHHBB", 0, 0, 2, 0, 0, 0, 0, 0, width, height, 32, 8)
             pntFile.seek(0)
             return tgaHeader + decompressedData
+        
+def createPaintFile(imagesPath, filename):
+    MagicNumber = b"PNT\x00"
