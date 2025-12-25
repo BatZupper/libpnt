@@ -1,7 +1,7 @@
 import zlib
 import struct
 
-#all the constants
+#declare the constants
 MAGIC_NUMBER_SIZE = 4
 BASENAME_SIZE = 100
 COUNT_SIZE = 4
@@ -28,11 +28,13 @@ class ImageHeader:
         self.md5 = []
         self.data_size = 0
 
+#check if it's a valid PNT file
 def pntCheck(pntFile):
     check = pntFile.read(MAGIC_NUMBER_SIZE) == b"PNT\x00"
     pntFile.seek(0)
     return check
-    
+
+#get the paint file header
 def getPNTHeader(pntFile):
     header = PaintFileHeader()
     header.magic = pntFile.read(MAGIC_NUMBER_SIZE)
@@ -41,11 +43,13 @@ def getPNTHeader(pntFile):
     pntFile.seek(0)
     return header
 
+#get the image header (specified by index)
 def getImageHeader(pntFile, index):
     imageHeader = ImageHeader()
     pntFile.seek(HEADER_SIZE)
 
     for i in range(index + 1):
+        #update all of the info
         filename = pntFile.read(IMAGE_FILENAME_SIZE)
         width = pntFile.read(IMAGE_WIDTH_SIZE)
         height = pntFile.read(IMAGE_HEIGHT_SIZE)
@@ -53,8 +57,10 @@ def getImageHeader(pntFile, index):
         data_size = int.from_bytes(pntFile.read(IMAGE_DATA_SIZE_SIZE), "little")
 
         if i != index:
+            #if not the right image skip
             pntFile.seek(data_size + IMAGE_PADDING, 1)
         else:
+            #set the temp header
             imageHeader.filename = filename.decode('ascii').rstrip('\x00')
             imageHeader.width = int.from_bytes(width, "little")
             imageHeader.height = int.from_bytes(height, "little")
@@ -63,6 +69,7 @@ def getImageHeader(pntFile, index):
 
     return imageHeader
 
+#decompress image (specified by index)
 def decompressImage(pntFile, index):
     pntFile.seek(HEADER_SIZE)
 
@@ -79,5 +86,6 @@ def decompressImage(pntFile, index):
             pntFile.seek(IMAGE_PADDING, 1)
             compressedData = pntFile.read(data_size - 8)
             decompressedData = zlib.decompress(compressedData, -15)
+            #set the tga header
             tgaHeader = struct.pack("<BBBHHBHHHHBB", 0, 0, 2, 0, 0, 0, 0, 0, width, height, 32, 8)
             return tgaHeader + decompressedData
