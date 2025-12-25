@@ -1,25 +1,20 @@
 import libpnt.libpnt as libpnt
+import sys
 
-pntFile = open("YOURFILE", "rb")
+pntFile = open(sys.argv[1], "rb")
 
 if libpnt.pntCheck(pntFile) == True:
     print("va bene procedo")
 
 pntHeader = libpnt.getPNTHeader(pntFile)
 
-print(pntHeader.magic)
-print(pntHeader.basename)
-print(pntHeader.count)
+print(pntHeader)
 index = 0
 while index <= pntHeader.count - 1:
     imageHeader = libpnt.getImageHeader(pntFile, index)
-    print(imageHeader.filename)
-    print(imageHeader.width)
-    print(imageHeader.height)
-    print(imageHeader.md5)
-    print(imageHeader.data_size)
-    with open(f"decompressed{index}.tga", "wb") as f:
-        f.write(libpnt.decompressImage(pntFile, index))
+    print(imageHeader)
+    # with open(f"decompressed{index}.tga", "wb") as f:
+    #     f.write(libpnt.decompressImage(pntFile, index))
     index += 1
 
 pntFile.close()

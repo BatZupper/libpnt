@@ -20,6 +20,9 @@ class PaintFileHeader:
         self.basename = ""
         self.count = 0
 
+    def __str__(self):
+        return f"Magic Number: {self.magic}\nBasename: {self.basename}\nCount: {self.count}"
+
 class ImageHeader:
     def __init__(self):
         self.filename = ""
@@ -27,6 +30,9 @@ class ImageHeader:
         self.height = 0
         self.md5 = []
         self.data_size = 0
+
+    def __str__(self):
+        return f"Filename: {self.filename}\nWidth: {self.width}\nHeight: {self.height}\nMD5: {self.md5}\nData Size: {self.data_size}"
 
 #check if it's a valid PNT file
 def pntCheck(pntFile):

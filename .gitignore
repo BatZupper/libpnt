@@ -59,3 +59,6 @@ dkms.conf
 *.tga
 *.bin
 *.bak
+
+#python stuff
+__pycache__/
