@@ -56,3 +56,6 @@ dkms.conf
 
 #MX Bikes related files
 *.pnt
+*.tga
+*.bin
+*.bak

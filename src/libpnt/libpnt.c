@@ -88,8 +88,8 @@ ImageHeader getPNTImageHeader(FILE* pntFile, int index) {
     ptr += IMAGE_WIDTH_SIZE;
     memcpy(&header.height, ptr, IMAGE_HEIGHT_SIZE);
     ptr += IMAGE_HEIGHT_SIZE;
-    memcpy(&header.metadata, ptr, IMAGE_METADATA_SIZE);
-    ptr += IMAGE_METADATA_SIZE;
+    memcpy(&header.md5, ptr, IMAGE_MD5_SIZE);
+    ptr += IMAGE_MD5_SIZE;
     memcpy(&header.data_size, ptr, IMAGE_DATA_SIZE_SIZE);
     free(buffer);
     return header;

@@ -10,8 +10,9 @@
 #define IMAGE_FILENAME_SIZE 100
 #define IMAGE_WIDTH_SIZE 4
 #define IMAGE_HEIGHT_SIZE 4
-#define IMAGE_METADATA_SIZE 16
+#define IMAGE_MD5_SIZE 16
 #define IMAGE_DATA_SIZE_SIZE 4 //this shit is ridiculus
+#define IMAGE_PADDING 8
 
 //define the header of the paint file
 typedef struct {
@@ -25,9 +26,9 @@ typedef struct {
     char filename[100];
     uint32_t width;
     uint32_t height;
-    uint8_t metadata[16]; //MD5 algorithm
+    uint8_t md5[16];
     uint32_t data_size;
-    uint8_t *data;
+    uint8_t *data; //raw deflate
 } ImageHeader;
 
 //declare the functions

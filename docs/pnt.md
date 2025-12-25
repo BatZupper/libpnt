@@ -17,16 +17,18 @@ struct PaintEntry {
     char filename[100];
     uint32_t width;
     uint32_t height;
-    uint8_t metadata[16]; //MD5 algorithm
+    uint8_t md5[16];
     uint32_t data_size;
     uint8_t data[data_size];
 };
 
 ```
 
-wich they look like this. Also the magic number is clear with is __"PNT "__ (50 4E 54 00 exadecimal) and looking at the code the compression might be something GZIP based but I'm not entirely sure yet.
+wich they look like this. Also the magic number is clear with is __"PNT "__ (50 4E 54 00 exadecimal).
 
-For the 16 bytes metadata array looking at the code is probably some encoded version of the words of the MD5 algorithm
+The format uses the md5 for integrity using 4 bytes per pixel.
+
+the compression is a simple raw inflate of a targa file (without a header)
 
 ## Decompressing
 
