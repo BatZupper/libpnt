@@ -38,7 +38,7 @@ def pntCheck(pntFile):
 def getPNTHeader(pntFile):
     header = PaintFileHeader()
     header.magic = pntFile.read(MAGIC_NUMBER_SIZE)
-    header.basename = pntFile.read(BASENAME_SIZE).decode('ascii').rstrip('\x00')
+    header.basename = pntFile.read(BASENAME_SIZE).decode('ascii', errors='ignore').rstrip('\x00')
     header.count = int.from_bytes(pntFile.read(COUNT_SIZE), 'little')
     pntFile.seek(0)
     return header
@@ -58,15 +58,16 @@ def getImageHeader(pntFile, index):
 
         if i != index:
             #if not the right image skip
-            pntFile.seek(data_size + IMAGE_PADDING, 1)
+            pntFile.seek(data_size, 1)
         else:
             #set the temp header
-            imageHeader.filename = filename.decode('ascii').rstrip('\x00')
+            imageHeader.filename = filename.decode('ascii', errors='ignore').rstrip('\x00')
             imageHeader.width = int.from_bytes(width, "little")
             imageHeader.height = int.from_bytes(height, "little")
             imageHeader.md5 = md5
             imageHeader.data_size = data_size
 
+    pntFile.seek(0)
     return imageHeader
 
 #decompress image (specified by index)
@@ -88,4 +89,5 @@ def decompressImage(pntFile, index):
             decompressedData = zlib.decompress(compressedData, -15)
             #set the tga header
             tgaHeader = struct.pack("<BBBHHBHHHHBB", 0, 0, 2, 0, 0, 0, 0, 0, width, height, 32, 8)
+            pntFile.seek(0)
             return tgaHeader + decompressedData
