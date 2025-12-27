@@ -28,6 +28,7 @@ typedef struct {
     uint32_t height;
     uint8_t md5[16];
     uint32_t data_size;
+    //8 bytes padding
     uint8_t *data; //raw deflate
 } ImageHeader;
 

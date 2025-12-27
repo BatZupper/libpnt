@@ -59,6 +59,7 @@ dkms.conf
 *.tga
 *.bin
 *.bak
+images/
 
 #python stuff
 __pycache__/

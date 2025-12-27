@@ -13,27 +13,28 @@ struct PaintFileHeader {
     uint32_t count;
 };
 
-struct PaintEntry {
+struct ImageHeader {
     char filename[100];
     uint32_t width;
     uint32_t height;
     uint8_t md5[16];
     uint32_t data_size;
+    //8 bytes padding
     uint8_t data[data_size];
 };
 
 ```
 
-wich they look like this. Also the magic number is clear with is __"PNT "__ (50 4E 54 00 exadecimal).
+starting by the paint header this is really straight forward it just contains the magic number, name of the paint wich has to be a fixed size of 100. If the actual name is smaller it just fills it with empty bytes and at the last the count of the images saved as a unsigned int.
 
-The format uses the md5 for integrity using 4 bytes per pixel.
+Now looking at the Image Header this has a few more stuff starting with the image file name without the extention again here it has to be a fixed size of 100 bytes, then pretty standard width and height both saved as unsigned ints then there's a MD5 checksum. The checksum is calculated by using this calculating the total number of pixer times the bytes per pixels (4 bytes per pixels). After that the file size + 8 bytes because there's a 8 bytes padding after the data size afther that the compressed image data. This header is written for each of the images in the file.
 
-the compression is a simple raw inflate of a targa file (without a header)
+The uncompressed data strutture is a TGA file without both the header and the footer. The data inside the tga is stored following the BGRA (Blu Green Red Alpha) format. Then the data is compressed using the raw deflate tecnology  
 
 ## Decompressing
 
-for decompressing the library only handle the parsing of the pnt and image header but as soon as i manage to decompress even a pixel of data i will put it in the library
+For decompressing the file the library very simply take the image (specified by index) uncompress the data using raw deflate then converting the BGRA into a more standard RGBA and then recreate the TGA header using the information from the Image header in the paint file
 
 ## Compressing
 
-I still have to write code for this part. I could make a siple header maker but it isn't worth it yet
+For compressing i basically just do the decompressing process but inverted with a few extra steps. First it recreates the magic number and using user input the paint name then it counts the tga files in the directory specified by user input and puts the number in the paint header. Then for each image using the information in the TGA header (specifically width and height) then calculates the cheksum using the total number of pixer times the bytes per pixels (4 bytes per pixels) with the MD5 algorithm then removes the header and footer then converts the data from RGBA to BGRA and compress it using the raw deflate algorith.
