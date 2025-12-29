@@ -142,28 +142,48 @@ def compressImage(imagePath):
     tgaFile.close()
     return compressedData
 
-def createPaintFile(imagesPath, paintName):
-    md5 = hashlib.md5()
-    with open("test.bin", "wb") as f:
-        #create PNT header
+import os
+import hashlib
+
+def createPaintFile(imagesDir, paintName, paintPath):
+    tga_files = [
+        f for f in os.listdir(imagesDir)
+        if f.lower().endswith(".tga")
+    ]
+
+    if not tga_files:
+        raise ValueError("Nessun file .tga trovato nella cartella")
+
+    with open(paintPath, "wb") as f:
         f.write(PNT_MAGIC_NUMBER)
         f.write(paintName.encode("ascii"))
         f.write(b"\x00" * (100 - len(paintName)))
-        f.write(b"\x01\x00\x00\x00") #TODO subsitute with actual image number
-        #TODO do it also with multiple images
-        #create image header
-        f.write(imagesPath[:-4].encode("ascii"))
-        f.write(b"\x00" * (104 - len(imagesPath))) # 100 basename bytes + 4 of the .tga removed (i need to fucking rewrite the whole thing)
-        with open(imagesPath, "rb") as tga:
-            tga.seek(12) #distance in the header between the start and the size
-            width = int.from_bytes(tga.read(2), "little")
-            height = int.from_bytes(tga.read(2), "little")
-            #create MD5 checksum
-            md5.update(int.to_bytes(width * height * 4, 8))
-            f.write(width.to_bytes(4, byteorder='little'))
-            f.write(height.to_bytes(4, byteorder='little'))
-            f.write(md5.digest())
-        compressedData = compressImage(imagesPath)
-        f.write((len(compressedData) + 8).to_bytes(4, "little"))
-        f.write(b"\x00" * 8)
-        f.write(compressedData)
+
+        # image number
+        f.write(len(tga_files).to_bytes(4, "little"))
+
+        for tga_name in tga_files:
+            tga_path = os.path.join(imagesDir, tga_name)
+            basename = os.path.splitext(tga_name)[0]
+
+            md5 = hashlib.md5()
+
+            f.write(basename.encode("ascii"))
+            f.write(b"\x00" * (100 - len(basename)))  
+            # 100 nome + 4 extra (come nel tuo formato)
+
+            with open(tga_path, "rb") as tga:
+                tga.seek(12)
+                width = int.from_bytes(tga.read(2), "little")
+                height = int.from_bytes(tga.read(2), "little")
+
+                md5.update((width * height * 4).to_bytes(8, "little"))
+
+                f.write(width.to_bytes(4, "little"))
+                f.write(height.to_bytes(4, "little"))
+                f.write(md5.digest())
+
+            compressedData = compressImage(tga_path)
+            f.write((len(compressedData) + 8).to_bytes(4, "little"))
+            f.write(b"\x00" * 8)
+            f.write(compressedData)
