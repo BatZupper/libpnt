@@ -120,30 +120,38 @@ def decompressImage(pntFile, index):
 
 def compressImage(imagePath):
     imageSize = os.path.getsize(imagePath)
-    tgaFile = open(imagePath, "rb")
-    tgaFile.seek(TGA_HEADER_SIZE, 0)
-    uncompressedData = tgaFile.read(imageSize - TGA_FOOTER_SIZE - TGA_HEADER_SIZE)
-    data = bytearray(uncompressedData)
-    #rgba to bgra
-    for i in range(0, len(data), 4):
-        r = data[i]
-        g = data[i+1]
-        b = data[i+2]
-        a = data[i+3]
 
-        data[i]   = b
-        data[i+1] = g
-        data[i+2] = r
-        data[i+3] = a
+    with open(imagePath, "rb") as tgaFile:
+        header = tgaFile.read(TGA_HEADER_SIZE)
 
-    uncompressedData = bytes(data)
+        pixel_depth = header[16]  # 24 o 32
+        has_alpha = (pixel_depth == 32)
 
-    compressedData = zlib.compress(uncompressedData, 9, -15)
-    tgaFile.close()
+        tgaFile.seek(TGA_HEADER_SIZE)
+        rawData = tgaFile.read(imageSize - TGA_HEADER_SIZE - TGA_FOOTER_SIZE)
+
+    data = bytearray()
+
+    if has_alpha:
+        # RGBA -> BGRA
+        for i in range(0, len(rawData), 4):
+            r = rawData[i]
+            g = rawData[i + 1]
+            b = rawData[i + 2]
+            a = rawData[i + 3]
+
+            data.extend([b, g, r, a])
+    else:
+        # RGB -> BGRA
+        for i in range(0, len(rawData), 3):
+            r = rawData[i]
+            g = rawData[i + 1]
+            b = rawData[i + 2]
+
+            data.extend([b, g, r, 255])  # alpha = 255
+
+    compressedData = zlib.compress(bytes(data), 9, -15)
     return compressedData
-
-import os
-import hashlib
 
 def createPaintFile(imagesDir, paintName, paintPath):
     tga_files = [
